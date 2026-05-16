@@ -4,16 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Planos de Aula</title>
-    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <header>
         <h1>Meus Planos de Aula</h1>
+        <nav>
+            <button onclick="mostrarListagem()">Ver Planos</button>
+            <button onclick="mostrarFormulario()">Novo Plano</button>
+        </nav>
     </header>
 
-    <main id="lista-planos">
-        <p>Carregando planos...</p>
+    <main>
+        <section id="tela-listagem">
+            <h2>Lista de Planos</h2>
+            <div id="lista-planos">Carregando planos...</div>
+        </section>
+
+        <section id="tela-formulario" style="display: none;">
+            <h2>Cadastrar Novo Plano</h2>
+            <form id="form-plano">
+                <input type="text" id="titulo" placeholder="Título do Plano" required><br><br>
+                <input type="text" id="disciplina" placeholder="Disciplina"><br><br>
+                <input type="date" id="dataPrevista"><br><br>
+                <textarea id="objetivo" placeholder="Objetivo do plano"></textarea><br><br>
+                <textarea id="ementa" placeholder="Ementa da disciplina"></textarea><br><br>
+                <input type="text" id="conteudos" placeholder="Conteúdos (ex: loops, funções)"><br><br>
+                <input type="text" id="recursos" placeholder="Recursos (ex: slides, links)"><br><br>
+                <input type="text" id="tags" placeholder="Tags (ex: node, js)"><br><br>
+                <button type="submit">Salvar Plano</button>
+            </form>
+        </section>
     </main>
 
     <script src="script.js"></script>
