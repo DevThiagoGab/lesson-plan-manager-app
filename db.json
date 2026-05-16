@@ -1,0 +1,48 @@
+{
+    "planos": [
+        {
+            "id": 1,
+            "titulo": "Desenvolvimento com Node.js e Express",
+            "objetivo": "Aprender a criar rotas e gerenciar requisições HTTP.",
+            "ementa": "Introdução ao Node.js; Middleware; Verbos HTTP (GET, POST, PUT, DELETE).",
+            "dataPrevista": "2026-05-20",
+            "disciplina": "Programação Backend",
+            "conteudos": [
+                "Configuração de ambiente",
+                "Criação de servidor com Express",
+                "Manipulação de JSON"
+            ],
+            "recursosApoio": [
+                "Documentação oficial do Node.js",
+                "Repositório de exemplos no GitHub"
+            ],
+            "tags": [
+                "node",
+                "express",
+                "backend"
+            ]
+        },
+        {
+            "id": 2,
+            "titulo": "Estilização com CSS Avançado",
+            "objetivo": "Dominar layouts complexos com Flexbox e Grid.",
+            "ementa": "Seletores avançados; Box Model; Flexbox; CSS Grid; Variáveis CSS.",
+            "dataPrevista": "2026-05-22",
+            "disciplina": "Desenvolvimento Frontend",
+            "conteudos": [
+                "Flex-direction e Justify-content",
+                "Grid-template-areas",
+                "Responsividade com Media Queries"
+            ],
+            "recursosApoio": [
+                "MDN Web Docs",
+                "CSS Tricks Guide"
+            ],
+            "tags": [
+                "css",
+                "frontend",
+                "design"
+            ]
+        }
+    ]
+}
