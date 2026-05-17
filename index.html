@@ -29,10 +29,60 @@
                 <input type="date" id="dataPrevista"><br><br>
                 <textarea id="objetivo" placeholder="Objetivo do plano"></textarea><br><br>
                 <textarea id="ementa" placeholder="Ementa da disciplina"></textarea><br><br>
-                <input type="text" id="conteudos" placeholder="Conteúdos (ex: loops, funções)"><br><br>
-                <input type="text" id="recursos" placeholder="Recursos (ex: slides, links)"><br><br>
-                <input type="text" id="tags" placeholder="Tags (ex: node, js)"><br><br>
-                <button type="submit">Salvar Plano</button>
+                
+                <div>
+                    <label>Conteúdos:</label>
+                    <div id="container-conteudos"></div>
+                    <button type="button" onclick="adicionarInput('container-conteudos')">+ Conteúdo</button>
+                </div><br>
+
+                <div>
+                    <label>Recursos de Apoio:</label>
+                    <div id="container-recursos"></div>
+                    <button type="button" onclick="adicionarInput('container-recursos')">+ Recurso</button>
+                </div><br>
+
+                <div>
+                    <label>Tags:</label>
+                    <div id="container-tags"></div>
+                    <button type="button" onclick="adicionarInput('container-tags')">+ Tag</button>
+                </div><br>
+                
+                <button type="submit">Salvar Novo Plano</button>
+            </form>
+        </section>
+
+        <section id="tela-editar" style="display: none;">
+            <h2>Editar Plano de Aula</h2>
+            <form id="form-editar-plano">
+                <input type="hidden" id="edit-id">
+                
+                <input type="text" id="edit-titulo" placeholder="Título do Plano" required><br><br>
+                <input type="text" id="edit-disciplina" placeholder="Disciplina"><br><br>
+                <input type="date" id="edit-dataPrevista"><br><br>
+                <textarea id="edit-objetivo" placeholder="Objetivo do plano"></textarea><br><br>
+                <textarea id="edit-ementa" placeholder="Ementa da disciplina"></textarea><br><br>
+                
+                <div>
+                    <label>Conteúdos:</label>
+                    <div id="edit-container-conteudos"></div>
+                    <button type="button" onclick="adicionarInput('edit-container-conteudos')">+ Conteúdo</button>
+                </div><br>
+
+                <div>
+                    <label>Recursos de Apoio:</label>
+                    <div id="edit-container-recursos"></div>
+                    <button type="button" onclick="adicionarInput('edit-container-recursos')">+ Recurso</button>
+                </div><br>
+
+                <div>
+                    <label>Tags:</label>
+                    <div id="edit-container-tags"></div>
+                    <button type="button" onclick="adicionarInput('edit-container-tags')">+ Tag</button>
+                </div><br>
+
+                <button type="submit">Salvar Alterações</button>
+                <button type="button" onclick="mostrarListagem()">Cancelar</button>
             </form>
         </section>
     </main>
