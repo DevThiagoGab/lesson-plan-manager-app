@@ -43,6 +43,94 @@
                 "frontend",
                 "design"
             ]
+        },
+        {
+            "id": 3,
+            "titulo": "Estilização com CSS Avançado",
+            "objetivo": "Dominar layouts complexos com Flexbox e Grid.",
+            "ementa": "Seletores avançados; Box Model; Flexbox; CSS Grid; Variáveis CSS.",
+            "dataPrevista": "2026-05-22",
+            "disciplina": "Desenvolvimento Frontend",
+            "conteudos": [
+                "Flex-direction e Justify-content",
+                "Grid-template-areas",
+                "Responsividade com Media Queries"
+            ],
+            "recursosApoio": [
+                "MDN Web Docs",
+                "CSS Tricks Guide"
+            ],
+            "tags": [
+                "css",
+                "frontend",
+                "design"
+            ]
+        },
+        {
+            "id": 4,
+            "titulo": "Estilização com CSS Avançado",
+            "objetivo": "Dominar layouts complexos com Flexbox e Grid.",
+            "ementa": "Seletores avançados; Box Model; Flexbox; CSS Grid; Variáveis CSS.",
+            "dataPrevista": "2026-05-22",
+            "disciplina": "Desenvolvimento Frontend",
+            "conteudos": [
+                "Flex-direction e Justify-content",
+                "Grid-template-areas",
+                "Responsividade com Media Queries"
+            ],
+            "recursosApoio": [
+                "MDN Web Docs",
+                "CSS Tricks Guide"
+            ],
+            "tags": [
+                "css",
+                "frontend",
+                "design"
+            ]
+        },
+        {
+            "id": 5,
+            "titulo": "Estilização com CSS Avançado",
+            "objetivo": "Dominar layouts complexos com Flexbox e Grid.",
+            "ementa": "Seletores avançados; Box Model; Flexbox; CSS Grid; Variáveis CSS.",
+            "dataPrevista": "2026-05-22",
+            "disciplina": "Desenvolvimento Frontend",
+            "conteudos": [
+                "Flex-direction e Justify-content",
+                "Grid-template-areas",
+                "Responsividade com Media Queries"
+            ],
+            "recursosApoio": [
+                "MDN Web Docs",
+                "CSS Tricks Guide"
+            ],
+            "tags": [
+                "css",
+                "frontend",
+                "design"
+            ]
+        },
+        {
+            "id": 6,
+            "titulo": "Estilização com CSS Avançado",
+            "objetivo": "Dominar layouts complexos com Flexbox e Grid.",
+            "ementa": "Seletores avançados; Box Model; Flexbox; CSS Grid; Variáveis CSS.",
+            "dataPrevista": "2026-05-22",
+            "disciplina": "Desenvolvimento Frontend",
+            "conteudos": [
+                "Flex-direction e Justify-content",
+                "Grid-template-areas",
+                "Responsividade com Media Queries"
+            ],
+            "recursosApoio": [
+                "MDN Web Docs",
+                "CSS Tricks Guide"
+            ],
+            "tags": [
+                "css",
+                "frontend",
+                "design"
+            ]
         }
     ]
 }

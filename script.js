@@ -1,6 +1,8 @@
 let listaDePlanos = [];
 
-// 1. Busca os dados iniciais do db.json
+let paginaAtual = 1;
+const itensPorPagina = 2;
+
 async function carregarPlanosDoBancoMock() {
     try {
         const resposta = await fetch('./db.json');
@@ -13,56 +15,21 @@ async function carregarPlanosDoBancoMock() {
     }
 }
 
-// 2. Cria dinamicamente um novo input na tela dentro do contêiner especificado
-function adicionarInput(containerId, valor = "") {
-    const container = document.getElementById(containerId);
-    
-    // Cria uma div para envelopar o input e o botão de remover
-    const divInput = document.createElement('div');
-    divInput.style.marginBottom = "5px";
-    
-    // Cria o input de texto
-    const input = document.createElement('input');
-    input.type = "text";
-    input.className = "campo-dinamico"; // Classe para podermos capturar os valores depois
-    input.value = valor;
-    input.placeholder = "Digite o item aqui";
-    
-    // Cria um botão simples de "X" para caso o usuário queira remover aquele input específico
-    const botaoRemover = document.createElement('button');
-    botaoRemover.type = "button";
-    botaoRemover.innerText = "X";
-    botaoRemover.style.marginLeft = "5px";
-    botaoRemover.onclick = function() {
-        container.removeChild(divInput);
-    };
-    
-    divInput.appendChild(input);
-    divInput.appendChild(botaoRemover);
-    container.appendChild(divInput);
-}
-
-// 3. Função auxiliar para ler todos os valores dos inputs dinâmicos de um contêiner
-function capturarValoresDinamicos(containerId) {
-    const container = document.getElementById(containerId);
-    const inputs = container.querySelectorAll('.campo-dinamico');
-    const valores = [];
-    
-    inputs.forEach(input => {
-        if (input.value.trim() !== "") {
-            valores.push(input.value.trim());
-        }
-    });
-    
-    return valores;
-}
-
-// 4. Desenha os cards na listagem principal
 function desenharPlanosNaTela() {
     const container = document.getElementById('lista-planos');
     container.innerHTML = ""; 
 
-    listaDePlanos.forEach(plano => {
+    const indiceInicial = (paginaAtual - 1) * itensPorPagina;
+    const indiceFinal = indiceInicial + itensPorPagina;
+    const planosDaPagina = listaDePlanos.slice(indiceInicial, indiceFinal);
+
+    if (planosDaPagina.length === 0 && paginaAtual > 1) {
+        paginaAtual--;
+        desenharPlanosNaTela();
+        return;
+    }
+
+    planosDaPagina.forEach(plano => {
         const listaConteudos = plano.conteudos && plano.conteudos.length > 0
             ? plano.conteudos.map(item => `<li>${item}</li>`).join('')
             : '<li>Nenhum conteúdo informado</li>';
@@ -95,9 +62,84 @@ function desenharPlanosNaTela() {
             </div>
         `;
     });
+
+    renderizarBotoesPagina();
 }
 
-// 5. Funções de Navegação da SPA
+function renderizarBotoesPagina() {
+    const containerPaginacao = document.getElementById('paginacao');
+    containerPaginacao.innerHTML = ""; 
+
+    const totalPaginas = Math.ceil(listaDePlanos.length / itensPorPagina);
+
+    if (totalPaginas <= 1) return;
+
+    if (paginaAtual > 1) {
+        const botaoAnterior = document.createElement('button');
+        botaoAnterior.innerText = "◀ Anterior";
+        botaoAnterior.style.marginRight = "10px";
+        botaoAnterior.onclick = function() {
+            paginaAtual--;
+            desenharPlanosNaTela();
+        };
+        containerPaginacao.appendChild(botaoAnterior);
+    }
+
+    const indicador = document.createElement('span');
+    indicador.innerText = ` Página ${paginaAtual} de ${totalPaginas} `;
+    containerPaginacao.appendChild(indicador);
+
+    if (paginaAtual < totalPaginas) {
+        const botaoProximo = document.createElement('button');
+        botaoProximo.innerText = "Próximo ▶";
+        botaoProximo.style.marginLeft = "10px";
+        botaoProximo.onclick = function() {
+            paginaAtual++;
+            desenharPlanosNaTela();
+        };
+        containerPaginacao.appendChild(botaoProximo);
+    }
+}
+
+function adicionarInput(containerId, valor = "") {
+    const container = document.getElementById(containerId);
+    
+    const divInput = document.createElement('div');
+    divInput.style.marginBottom = "5px";
+    
+    const input = document.createElement('input');
+    input.type = "text";
+    input.className = "campo-dinamico"; 
+    input.value = valor;
+    input.placeholder = "Digite o item aqui";
+    
+    const botaoRemover = document.createElement('button');
+    botaoRemover.type = "button";
+    botaoRemover.innerText = "X";
+    botaoRemover.style.marginLeft = "5px";
+    botaoRemover.onclick = function() {
+        container.removeChild(divInput);
+    };
+    
+    divInput.appendChild(input);
+    divInput.appendChild(botaoRemover);
+    container.appendChild(divInput);
+}
+
+function capturarValoresDinamicos(containerId) {
+    const container = document.getElementById(containerId);
+    const inputs = container.querySelectorAll('.campo-dinamico');
+    const valores = [];
+    
+    inputs.forEach(input => {
+        if (input.value.trim() !== "") {
+            valores.push(input.value.trim());
+        }
+    });
+    
+    return valores;
+}
+
 function mostrarListagem() {
     document.getElementById('tela-listagem').style.display = 'block';
     document.getElementById('tela-formulario').style.display = 'none';
@@ -109,7 +151,6 @@ function mostrarFormulario() {
     document.getElementById('tela-formulario').style.display = 'block';
     document.getElementById('tela-editar').style.display = 'none';
     
-    // Limpa e inicia os contêineres de cadastro com pelo menos 1 input em branco padrão
     document.getElementById('container-conteudos').innerHTML = "";
     document.getElementById('container-recursos').innerHTML = "";
     document.getElementById('container-tags').innerHTML = "";
@@ -124,7 +165,6 @@ function mostrarTelaEditar() {
     document.getElementById('tela-editar').style.display = 'block';
 }
 
-// 6. Lógica de Exclusão
 function apagarPlano(id) {
     if (confirm("Tem certeza que deseja apagar este plano?")) {
         listaDePlanos = listaDePlanos.filter(plano => plano.id !== id);
@@ -133,7 +173,6 @@ function apagarPlano(id) {
     }
 }
 
-// 7. Carrega os dados na tela de Edição (Montando os múltiplos inputs salvos)
 function prepararEdicao(id) {
     const plano = listaDePlanos.find(p => p.id === id);
 
@@ -145,17 +184,14 @@ function prepararEdicao(id) {
         document.getElementById('edit-objetivo').value = plano.objetivo || '';
         document.getElementById('edit-ementa').value = plano.ementa || '';
         
-        // Limpa os contêineres antigos da edição
         document.getElementById('edit-container-conteudos').innerHTML = "";
         document.getElementById('edit-container-recursos').innerHTML = "";
         document.getElementById('edit-container-tags').innerHTML = "";
 
-        // Para cada item que estava salvo na lista, cria um input preenchido
         if (plano.conteudos) plano.conteudos.forEach(c => adicionarInput('edit-container-conteudos', c));
         if (plano.recursosApoio) plano.recursosApoio.forEach(r => adicionarInput('edit-container-recursos', r));
         if (plano.tags) plano.tags.forEach(t => adicionarInput('edit-container-tags', t));
 
-        // Se a lista estiver vazia por algum motivo, põe um campo em branco
         if (!plano.conteudos || plano.conteudos.length === 0) adicionarInput('edit-container-conteudos');
         if (!plano.recursosApoio || plano.recursosApoio.length === 0) adicionarInput('edit-container-recursos');
         if (!plano.tags || plano.tags.length === 0) adicionarInput('edit-container-tags');
@@ -164,7 +200,6 @@ function prepararEdicao(id) {
     }
 }
 
-// 8. Evento de Salvar o Cadastro
 document.getElementById('form-plano').addEventListener('submit', function(event) {
     event.preventDefault(); 
 
@@ -175,21 +210,19 @@ document.getElementById('form-plano').addEventListener('submit', function(event)
         dataPrevista: document.getElementById('dataPrevista').value,
         objetivo: document.getElementById('objetivo').value,
         ementa: document.getElementById('ementa').value,
-        
-        // Captura os valores de todos os inputs que o usuário criou dinamicamente
         conteudos: capturarValoresDinamicos('container-conteudos'),
         recursosApoio: capturarValoresDinamicos('container-recursos'),
         tags: capturarValoresDinamicos('container-tags')
     };
 
     listaDePlanos.unshift(novoPlano); 
+    paginaAtual = 1;
     desenharPlanosNaTela(); 
     this.reset(); 
     alert("Plano adicionado!");
     mostrarListagem();
 });
 
-// 9. Evento de Salvar a Edição
 document.getElementById('form-editar-plano').addEventListener('submit', function(event) {
     event.preventDefault();
 
@@ -203,7 +236,6 @@ document.getElementById('form-editar-plano').addEventListener('submit', function
         plano.objetivo = document.getElementById('edit-objetivo').value;
         plano.ementa = document.getElementById('edit-ementa').value;
         
-        // Captura as alterações vindas dos contêineres dinâmicos de edição
         plano.conteudos = capturarValoresDinamicos('edit-container-conteudos');
         plano.recursosApoio = capturarValoresDinamicos('edit-container-recursos');
         plano.tags = capturarValoresDinamicos('edit-container-tags');
@@ -214,5 +246,4 @@ document.getElementById('form-editar-plano').addEventListener('submit', function
     }
 });
 
-// Inicialização
 carregarPlanosDoBancoMock();

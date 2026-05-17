@@ -19,6 +19,8 @@
         <section id="tela-listagem">
             <h2>Lista de Planos</h2>
             <div id="lista-planos">Carregando planos...</div>
+            
+            <div id="paginacao" style="margin-top: 20px; text-align: center;"></div>
         </section>
 
         <section id="tela-formulario" style="display: none;">
@@ -31,19 +33,19 @@
                 <textarea id="ementa" placeholder="Ementa da disciplina"></textarea><br><br>
                 
                 <div>
-                    <label>Conteúdos:</label>
+                    <label><strong>Conteúdos:</strong></label>
                     <div id="container-conteudos"></div>
                     <button type="button" onclick="adicionarInput('container-conteudos')">+ Conteúdo</button>
                 </div><br>
 
                 <div>
-                    <label>Recursos de Apoio:</label>
+                    <label><strong>Recursos de Apoio:</strong></label>
                     <div id="container-recursos"></div>
                     <button type="button" onclick="adicionarInput('container-recursos')">+ Recurso</button>
                 </div><br>
 
                 <div>
-                    <label>Tags:</label>
+                    <label><strong>Tags:</strong></label>
                     <div id="container-tags"></div>
                     <button type="button" onclick="adicionarInput('container-tags')">+ Tag</button>
                 </div><br>
@@ -64,19 +66,19 @@
                 <textarea id="edit-ementa" placeholder="Ementa da disciplina"></textarea><br><br>
                 
                 <div>
-                    <label>Conteúdos:</label>
+                    <label><strong>Conteúdos:</strong></label>
                     <div id="edit-container-conteudos"></div>
                     <button type="button" onclick="adicionarInput('edit-container-conteudos')">+ Conteúdo</button>
                 </div><br>
 
                 <div>
-                    <label>Recursos de Apoio:</label>
+                    <label><strong>Recursos de Apoio:</strong></label>
                     <div id="edit-container-recursos"></div>
                     <button type="button" onclick="adicionarInput('edit-container-recursos')">+ Recurso</button>
                 </div><br>
 
                 <div>
-                    <label>Tags:</label>
+                    <label><strong>Tags:</strong></label>
                     <div id="edit-container-tags"></div>
                     <button type="button" onclick="adicionarInput('edit-container-tags')">+ Tag</button>
                 </div><br>
