@@ -1,3 +1,4 @@
+const API_URL = 'http://localhost:3000/planos';
 let listaDePlanos = [];
 
 let paginaAtual = 1;
@@ -5,13 +6,15 @@ const itensPorPagina = 2;
 
 async function carregarPlanosDoBancoMock() {
     try {
-        const resposta = await fetch('./db.json');
-        const dados = await resposta.json();
-        listaDePlanos = dados.planos;
+        const resposta = await fetch(API_URL);
+
+        if (!resposta.ok) throw new Error('Erro ao buscar dados do servidor');
+
+        listaDePlanos = await resposta.json();
         desenharPlanosNaTela();
     } catch (erro) {
-        console.error("Erro ao carregar o mock:", erro);
-        document.getElementById('lista-planos').innerHTML = "Erro ao carregar os dados do db.json.";
+        console.error("Erro na integração:", erro);
+        document.getElementById('lista-planos').innerHTML = "Erro ao conectar com o servidor Back-end. Verifique se ele está ligado!";
     }
 }
 
@@ -19,13 +22,44 @@ function desenharPlanosNaTela() {
     const container = document.getElementById('lista-planos');
     container.innerHTML = "";
 
+    const buscaTitulo = document.getElementById('filtro-titulo').value.toLowerCase().trim();
+    const buscaDisciplina = document.getElementById('filtro-disciplina').value.toLowerCase().trim();
+    const buscaTag = document.getElementById('filtro-tag').value.toLowerCase().trim();
+    const buscaData = document.getElementById('filtro-data').value;
+    const tipoOrdenacao = document.getElementById('ordenacao-seletor').value;
+
+    let planosExibidos = listaDePlanos.filter(plano => {
+        const bateTitulo = plano.titulo.toLowerCase().includes(buscaTitulo);
+        const bateDisciplina = !buscaDisciplina || (plano.disciplina && plano.disciplina.toLowerCase().includes(buscaDisciplina));
+        const bateTag = !buscaTag || (plano.tags && plano.tags.some(t => t.toLowerCase().includes(buscaTag)));
+        const bateData = !buscaData || (plano.dataPrevista === buscaData);
+
+        return bateTitulo && bateDisciplina && bateTag && bateData;
+    });
+
+    if (tipoOrdenacao === "titulo-asc") {
+        planosExibidos.sort((a, b) => a.titulo.localeCompare(b.titulo));
+    } else if (tipoOrdenacao === "titulo-desc") {
+        planosExibidos.sort((a, b) => b.titulo.localeCompare(a.titulo));
+    } else if (tipoOrdenacao === "cadastro-asc") {
+        planosExibidos.sort((a, b) => a.id - b.id);
+    } else if (tipoOrdenacao === "cadastro-desc") {
+        planosExibidos.sort((a, b) => b.id - a.id);
+    }
+
     const indiceInicial = (paginaAtual - 1) * itensPorPagina;
     const indiceFinal = indiceInicial + itensPorPagina;
-    const planosDaPagina = listaDePlanos.slice(indiceInicial, indiceFinal);
+    const planosDaPagina = planosExibidos.slice(indiceInicial, indiceFinal);
 
     if (planosDaPagina.length === 0 && paginaAtual > 1) {
         paginaAtual--;
         desenharPlanosNaTela();
+        return;
+    }
+
+    if (planosDaPagina.length === 0) {
+        container.innerHTML = `<p style="text-align:center; color:#777; font-family:sans-serif; margin-top:20px;">Nenhum plano de aula encontrado para os filtros aplicados.</p>`;
+        renderizarBotoesPaginaAdaptado(0);
         return;
     }
 
@@ -63,14 +97,14 @@ function desenharPlanosNaTela() {
         `;
     });
 
-    renderizarBotoesPagina();
+    renderizarBotoesPaginaAdaptado(planosExibidos.length);
 }
 
-function renderizarBotoesPagina() {
+function renderizarBotoesPaginaAdaptado(totalItensFiltrados) {
     const containerPaginacao = document.getElementById('paginacao');
     containerPaginacao.innerHTML = "";
 
-    const totalPaginas = Math.ceil(listaDePlanos.length / itensPorPagina);
+    const totalPaginas = Math.ceil(totalItensFiltrados / itensPorPagina);
 
     if (totalPaginas <= 1) return;
 
@@ -166,11 +200,22 @@ function mostrarTelaEditar() {
     document.getElementById('tela-editar').style.display = 'block';
 }
 
-function apagarPlano(id) {
+async function apagarPlano(id) {
     if (confirm("Tem certeza que deseja apagar este plano?")) {
-        listaDePlanos = listaDePlanos.filter(plano => plano.id !== id);
-        desenharPlanosNaTela();
-        alert("Plano excluído!");
+        try {
+            const resposta = await fetch(`${API_URL}/${id}`, {
+                method: 'DELETE'
+            });
+
+            if (!resposta.ok) throw new Error('Erro ao deletar no servidor');
+
+            listaDePlanos = listaDePlanos.filter(plano => plano.id !== id);
+            desenharPlanosNaTela();
+            alert("Plano excluído com sucesso do Banco de Dados!");
+        } catch (erro) {
+            console.error("Erro ao deletar:", erro);
+            alert("Não foi possível excluir o plano do servidor.");
+        }
     }
 }
 
@@ -201,7 +246,7 @@ function prepararEdicao(id) {
     }
 }
 
-document.getElementById('form-plano').addEventListener('submit', function (event) {
+document.getElementById('form-plano').addEventListener('submit', async function (event) {
     event.preventDefault();
 
     const conteudos = capturarValoresDinamicos('container-conteudos');
@@ -214,7 +259,6 @@ document.getElementById('form-plano').addEventListener('submit', function (event
     }
 
     const novoPlano = {
-        id: Date.now(),
         titulo: document.getElementById('titulo').value,
         disciplina: document.getElementById('disciplina').value,
         dataPrevista: document.getElementById('dataPrevista').value,
@@ -225,21 +269,45 @@ document.getElementById('form-plano').addEventListener('submit', function (event
         tags: tags
     };
 
-    listaDePlanos.unshift(novoPlano);
-    paginaAtual = 1;
-    desenharPlanosNaTela();
-    this.reset();
-    alert("Plano adicionado!");
-    mostrarListagem();
+    try {
+        const resposta = await fetch(API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(novoPlano)
+        });
+
+        if (resposta.status === 400) {
+            const dadosErro = await resposta.json();
+            alert("Erros de validação:\n- " + dadosErro.erros.join("\n- "));
+            return;
+        }
+
+        if (!resposta.ok) throw new Error('Erro ao salvar plano no servidor');
+
+        const planoSalvoNoBanco = await resposta.json();
+
+        listaDePlanos.unshift(planoSalvoNoBanco);
+        paginaAtual = 1;
+        desenharPlanosNaTela();
+        this.reset();
+        alert("Plano adicionado com sucesso no Banco!");
+        mostrarListagem();
+
+    } catch (erro) {
+        console.error("Erro ao cadastrar:", erro);
+        alert("Erro interno: Não foi possível conectar ao servidor back-end.");
+    }
 });
 
-document.getElementById('form-editar-plano').addEventListener('submit', function (event) {
+document.getElementById('form-editar-plano').addEventListener('submit', async function (event) {
     event.preventDefault();
 
     const idParaEditar = Number(document.getElementById('edit-id').value);
-    const plano = listaDePlanos.find(p => p.id === idParaEditar);
+    const planoLocal = listaDePlanos.find(p => p.id === idParaEditar);
 
-    if (plano) {
+    if (planoLocal) {
         const conteudos = capturarValoresDinamicos('edit-container-conteudos');
         const recursosApoio = capturarValoresDinamicos('edit-container-recursos');
         const tags = capturarValoresDinamicos('edit-container-tags');
@@ -249,19 +317,60 @@ document.getElementById('form-editar-plano').addEventListener('submit', function
             return;
         }
 
-        plano.titulo = document.getElementById('edit-titulo').value;
-        plano.disciplina = document.getElementById('edit-disciplina').value;
-        plano.dataPrevista = document.getElementById('edit-dataPrevista').value;
-        plano.objetivo = document.getElementById('edit-objetivo').value;
-        plano.ementa = document.getElementById('edit-ementa').value;
-        plano.conteudos = conteudos;
-        plano.recursosApoio = recursosApoio;
-        plano.tags = tags;
+        const dadosAtualizados = {
+            titulo: document.getElementById('edit-titulo').value,
+            disciplina: document.getElementById('edit-disciplina').value,
+            dataPrevista: document.getElementById('edit-dataPrevista').value,
+            objetivo: document.getElementById('edit-objetivo').value,
+            ementa: document.getElementById('edit-ementa').value,
+            conteudos: conteudos,
+            recursosApoio: recursosApoio,
+            tags: tags
+        };
 
-        desenharPlanosNaTela();
-        alert("Plano atualizado com sucesso!");
-        mostrarListagem();
+        try {
+            const resposta = await fetch(`${API_URL}/${idParaEditar}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(dadosAtualizados)
+            });
+
+            if (resposta.status === 400) {
+                const dadosErro = await resposta.json();
+                alert("Erros de validação na Edição:\n- " + dadosErro.erros.join("\n- "));
+                return;
+            }
+
+            if (!resposta.ok) throw new Error('Erro ao atualizar plano no servidor');
+
+            Object.assign(planoLocal, dadosAtualizados);
+
+            desenharPlanosNaTela();
+            alert("Plano atualizado com sucesso no Banco!");
+            mostrarListagem();
+        } catch (erro) {
+            console.error("Erro ao editar:", erro);
+            alert("Não foi possível atualizar o plano no servidor.");
+        }
     }
+});
+
+document.getElementById('filtro-titulo').addEventListener('input', () => { paginaAtual = 1; desenharPlanosNaTela(); });
+document.getElementById('filtro-disciplina').addEventListener('input', () => { paginaAtual = 1; desenharPlanosNaTela(); });
+document.getElementById('filtro-tag').addEventListener('input', () => { paginaAtual = 1; desenharPlanosNaTela(); });
+document.getElementById('filtro-data').addEventListener('change', () => { paginaAtual = 1; desenharPlanosNaTela(); });
+document.getElementById('ordenacao-seletor').addEventListener('change', () => { desenharPlanosNaTela(); });
+
+document.getElementById('btn-limpar-filtros').addEventListener('click', function () {
+    document.getElementById('filtro-titulo').value = "";
+    document.getElementById('filtro-disciplina').value = "";
+    document.getElementById('filtro-tag').value = "";
+    document.getElementById('filtro-data').value = "";
+    document.getElementById('ordenacao-seletor').value = "cadastro-desc";
+    paginaAtual = 1;
+    desenharPlanosNaTela();
 });
 
 carregarPlanosDoBancoMock();

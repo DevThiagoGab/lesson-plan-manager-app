@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Planos de Aula</title>
 </head>
+
 <body>
 
     <header>
@@ -18,8 +20,44 @@
     <main>
         <section id="tela-listagem">
             <h2>Lista de Planos</h2>
+
+            <div
+                style="background: #f8f9fa; padding: 15px; margin-bottom: 20px; border-radius: 8px; font-family: sans-serif;">
+                <h3 style="margin-top: 0;">Filtros e Ordenação</h3>
+
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px;">
+                    <input type="text" id="filtro-titulo" placeholder="Buscar por Título..."
+                        style="padding: 6px; flex: 1; min-width: 200px;">
+
+                    <input type="text" id="filtro-disciplina" placeholder="Filtrar por Disciplina..."
+                        style="padding: 6px; flex: 1; min-width: 150px;">
+
+                    <input type="text" id="filtro-tag" placeholder="Filtrar por Tag..."
+                        style="padding: 6px; flex: 1; min-width: 120px;">
+
+                    <input type="date" id="filtro-data" style="padding: 6px;">
+                </div>
+
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <div>
+                        <label style="margin-right: 5px;"><strong>Ordenar por:</strong></label>
+                        <select id="ordenacao-seletor" style="padding: 6px;">
+                            <option value="cadastro-desc">Mais recentes (Padrão)</option>
+                            <option value="cadastro-asc">Mais antigos</option>
+                            <option value="titulo-asc">Título (A-Z)</option>
+                            <option value="titulo-desc">Título (Z-A)</option>
+                        </select>
+                    </div>
+
+                    <button id="btn-limpar-filtros"
+                        style="padding: 6px 12px; background: #6c757d; color: white; border: none; border-radius: 3px; cursor: pointer;">Limpar
+                        Filtros</button>
+                </div>
+            </div>
+
             <div id="lista-planos">Carregando planos...</div>
-            
+
             <div id="paginacao" style="margin-top: 20px; text-align: center;"></div>
         </section>
 
@@ -31,7 +69,7 @@
                 <input type="date" id="dataPrevista" required><br><br>
                 <textarea id="objetivo" placeholder="Objetivo do plano" required></textarea><br><br>
                 <textarea id="ementa" placeholder="Ementa da disciplina" required></textarea><br><br>
-                
+
                 <div>
                     <label><strong>Conteúdos (obrigatório pelo menos um):</strong></label>
                     <div id="container-conteudos"></div>
@@ -49,7 +87,7 @@
                     <div id="container-tags"></div>
                     <button type="button" onclick="adicionarInput('container-tags')">+ Tag</button>
                 </div><br>
-                
+
                 <button type="submit">Salvar Novo Plano</button>
             </form>
         </section>
@@ -58,13 +96,13 @@
             <h2>Editar Plano de Aula</h2>
             <form id="form-editar-plano">
                 <input type="hidden" id="edit-id">
-                
+
                 <input type="text" id="edit-titulo" placeholder="Título do Plano" required><br><br>
                 <input type="text" id="edit-disciplina" placeholder="Disciplina" required><br><br>
                 <input type="date" id="edit-dataPrevista" required><br><br>
                 <textarea id="edit-objetivo" placeholder="Objetivo do plano" required></textarea><br><br>
                 <textarea id="edit-ementa" placeholder="Ementa da disciplina" required></textarea><br><br>
-                
+
                 <div>
                     <label><strong>Conteúdos (obrigatório pelo menos um):</strong></label>
                     <div id="edit-container-conteudos"></div>
@@ -91,4 +129,5 @@
 
     <script src="script.js"></script>
 </body>
+
 </html>
