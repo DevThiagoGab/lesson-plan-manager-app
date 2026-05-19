@@ -17,7 +17,7 @@ async function carregarPlanosDoBancoMock() {
 
 function desenharPlanosNaTela() {
     const container = document.getElementById('lista-planos');
-    container.innerHTML = ""; 
+    container.innerHTML = "";
 
     const indiceInicial = (paginaAtual - 1) * itensPorPagina;
     const indiceFinal = indiceInicial + itensPorPagina;
@@ -68,7 +68,7 @@ function desenharPlanosNaTela() {
 
 function renderizarBotoesPagina() {
     const containerPaginacao = document.getElementById('paginacao');
-    containerPaginacao.innerHTML = ""; 
+    containerPaginacao.innerHTML = "";
 
     const totalPaginas = Math.ceil(listaDePlanos.length / itensPorPagina);
 
@@ -78,7 +78,7 @@ function renderizarBotoesPagina() {
         const botaoAnterior = document.createElement('button');
         botaoAnterior.innerText = "◀ Anterior";
         botaoAnterior.style.marginRight = "10px";
-        botaoAnterior.onclick = function() {
+        botaoAnterior.onclick = function () {
             paginaAtual--;
             desenharPlanosNaTela();
         };
@@ -93,7 +93,7 @@ function renderizarBotoesPagina() {
         const botaoProximo = document.createElement('button');
         botaoProximo.innerText = "Próximo ▶";
         botaoProximo.style.marginLeft = "10px";
-        botaoProximo.onclick = function() {
+        botaoProximo.onclick = function () {
             paginaAtual++;
             desenharPlanosNaTela();
         };
@@ -103,24 +103,25 @@ function renderizarBotoesPagina() {
 
 function adicionarInput(containerId, valor = "") {
     const container = document.getElementById(containerId);
-    
+
     const divInput = document.createElement('div');
     divInput.style.marginBottom = "5px";
-    
+
     const input = document.createElement('input');
     input.type = "text";
-    input.className = "campo-dinamico"; 
+    input.className = "campo-dinamico";
     input.value = valor;
     input.placeholder = "Digite o item aqui";
-    
+    input.required = true;
+
     const botaoRemover = document.createElement('button');
     botaoRemover.type = "button";
     botaoRemover.innerText = "X";
     botaoRemover.style.marginLeft = "5px";
-    botaoRemover.onclick = function() {
+    botaoRemover.onclick = function () {
         container.removeChild(divInput);
     };
-    
+
     divInput.appendChild(input);
     divInput.appendChild(botaoRemover);
     container.appendChild(divInput);
@@ -130,13 +131,13 @@ function capturarValoresDinamicos(containerId) {
     const container = document.getElementById(containerId);
     const inputs = container.querySelectorAll('.campo-dinamico');
     const valores = [];
-    
+
     inputs.forEach(input => {
         if (input.value.trim() !== "") {
             valores.push(input.value.trim());
         }
     });
-    
+
     return valores;
 }
 
@@ -150,7 +151,7 @@ function mostrarFormulario() {
     document.getElementById('tela-listagem').style.display = 'none';
     document.getElementById('tela-formulario').style.display = 'block';
     document.getElementById('tela-editar').style.display = 'none';
-    
+
     document.getElementById('container-conteudos').innerHTML = "";
     document.getElementById('container-recursos').innerHTML = "";
     document.getElementById('container-tags').innerHTML = "";
@@ -183,7 +184,7 @@ function prepararEdicao(id) {
         document.getElementById('edit-dataPrevista').value = plano.dataPrevista || '';
         document.getElementById('edit-objetivo').value = plano.objetivo || '';
         document.getElementById('edit-ementa').value = plano.ementa || '';
-        
+
         document.getElementById('edit-container-conteudos').innerHTML = "";
         document.getElementById('edit-container-recursos').innerHTML = "";
         document.getElementById('edit-container-tags').innerHTML = "";
@@ -200,8 +201,17 @@ function prepararEdicao(id) {
     }
 }
 
-document.getElementById('form-plano').addEventListener('submit', function(event) {
-    event.preventDefault(); 
+document.getElementById('form-plano').addEventListener('submit', function (event) {
+    event.preventDefault();
+
+    const conteudos = capturarValoresDinamicos('container-conteudos');
+    const recursosApoio = capturarValoresDinamicos('container-recursos');
+    const tags = capturarValoresDinamicos('container-tags');
+
+    if (conteudos.length === 0 || recursosApoio.length === 0 || tags.length === 0) {
+        alert("Por favor, adicione pelo menos um Conteúdo, um Recurso e uma Tag.");
+        return;
+    }
 
     const novoPlano = {
         id: Date.now(),
@@ -210,35 +220,43 @@ document.getElementById('form-plano').addEventListener('submit', function(event)
         dataPrevista: document.getElementById('dataPrevista').value,
         objetivo: document.getElementById('objetivo').value,
         ementa: document.getElementById('ementa').value,
-        conteudos: capturarValoresDinamicos('container-conteudos'),
-        recursosApoio: capturarValoresDinamicos('container-recursos'),
-        tags: capturarValoresDinamicos('container-tags')
+        conteudos: conteudos,
+        recursosApoio: recursosApoio,
+        tags: tags
     };
 
-    listaDePlanos.unshift(novoPlano); 
+    listaDePlanos.unshift(novoPlano);
     paginaAtual = 1;
-    desenharPlanosNaTela(); 
-    this.reset(); 
+    desenharPlanosNaTela();
+    this.reset();
     alert("Plano adicionado!");
     mostrarListagem();
 });
 
-document.getElementById('form-editar-plano').addEventListener('submit', function(event) {
+document.getElementById('form-editar-plano').addEventListener('submit', function (event) {
     event.preventDefault();
 
     const idParaEditar = Number(document.getElementById('edit-id').value);
     const plano = listaDePlanos.find(p => p.id === idParaEditar);
 
     if (plano) {
+        const conteudos = capturarValoresDinamicos('edit-container-conteudos');
+        const recursosApoio = capturarValoresDinamicos('edit-container-recursos');
+        const tags = capturarValoresDinamicos('edit-container-tags');
+
+        if (conteudos.length === 0 || recursosApoio.length === 0 || tags.length === 0) {
+            alert("Por favor, adicione pelo menos um Conteúdo, um Recurso e uma Tag.");
+            return;
+        }
+
         plano.titulo = document.getElementById('edit-titulo').value;
         plano.disciplina = document.getElementById('edit-disciplina').value;
         plano.dataPrevista = document.getElementById('edit-dataPrevista').value;
         plano.objetivo = document.getElementById('edit-objetivo').value;
         plano.ementa = document.getElementById('edit-ementa').value;
-        
-        plano.conteudos = capturarValoresDinamicos('edit-container-conteudos');
-        plano.recursosApoio = capturarValoresDinamicos('edit-container-recursos');
-        plano.tags = capturarValoresDinamicos('edit-container-tags');
+        plano.conteudos = conteudos;
+        plano.recursosApoio = recursosApoio;
+        plano.tags = tags;
 
         desenharPlanosNaTela();
         alert("Plano atualizado com sucesso!");

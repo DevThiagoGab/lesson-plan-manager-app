@@ -27,25 +27,25 @@
             <h2>Cadastrar Novo Plano</h2>
             <form id="form-plano">
                 <input type="text" id="titulo" placeholder="Título do Plano" required><br><br>
-                <input type="text" id="disciplina" placeholder="Disciplina"><br><br>
-                <input type="date" id="dataPrevista"><br><br>
-                <textarea id="objetivo" placeholder="Objetivo do plano"></textarea><br><br>
-                <textarea id="ementa" placeholder="Ementa da disciplina"></textarea><br><br>
+                <input type="text" id="disciplina" placeholder="Disciplina" required><br><br>
+                <input type="date" id="dataPrevista" required><br><br>
+                <textarea id="objetivo" placeholder="Objetivo do plano" required></textarea><br><br>
+                <textarea id="ementa" placeholder="Ementa da disciplina" required></textarea><br><br>
                 
                 <div>
-                    <label><strong>Conteúdos:</strong></label>
+                    <label><strong>Conteúdos (obrigatório pelo menos um):</strong></label>
                     <div id="container-conteudos"></div>
                     <button type="button" onclick="adicionarInput('container-conteudos')">+ Conteúdo</button>
                 </div><br>
 
                 <div>
-                    <label><strong>Recursos de Apoio:</strong></label>
+                    <label><strong>Recursos de Apoio (obrigatório pelo menos um):</strong></label>
                     <div id="container-recursos"></div>
                     <button type="button" onclick="adicionarInput('container-recursos')">+ Recurso</button>
                 </div><br>
 
                 <div>
-                    <label><strong>Tags:</strong></label>
+                    <label><strong>Tags (obrigatório pelo menos um):</strong></label>
                     <div id="container-tags"></div>
                     <button type="button" onclick="adicionarInput('container-tags')">+ Tag</button>
                 </div><br>
@@ -60,25 +60,25 @@
                 <input type="hidden" id="edit-id">
                 
                 <input type="text" id="edit-titulo" placeholder="Título do Plano" required><br><br>
-                <input type="text" id="edit-disciplina" placeholder="Disciplina"><br><br>
-                <input type="date" id="edit-dataPrevista"><br><br>
-                <textarea id="edit-objetivo" placeholder="Objetivo do plano"></textarea><br><br>
-                <textarea id="edit-ementa" placeholder="Ementa da disciplina"></textarea><br><br>
+                <input type="text" id="edit-disciplina" placeholder="Disciplina" required><br><br>
+                <input type="date" id="edit-dataPrevista" required><br><br>
+                <textarea id="edit-objetivo" placeholder="Objetivo do plano" required></textarea><br><br>
+                <textarea id="edit-ementa" placeholder="Ementa da disciplina" required></textarea><br><br>
                 
                 <div>
-                    <label><strong>Conteúdos:</strong></label>
+                    <label><strong>Conteúdos (obrigatório pelo menos um):</strong></label>
                     <div id="edit-container-conteudos"></div>
                     <button type="button" onclick="adicionarInput('edit-container-conteudos')">+ Conteúdo</button>
                 </div><br>
 
                 <div>
-                    <label><strong>Recursos de Apoio:</strong></label>
+                    <label><strong>Recursos de Apoio (obrigatório pelo menos um):</strong></label>
                     <div id="edit-container-recursos"></div>
                     <button type="button" onclick="adicionarInput('edit-container-recursos')">+ Recurso</button>
                 </div><br>
 
                 <div>
-                    <label><strong>Tags:</strong></label>
+                    <label><strong>Tags (obrigatório pelo menos um):</strong></label>
                     <div id="edit-container-tags"></div>
                     <button type="button" onclick="adicionarInput('edit-container-tags')">+ Tag</button>
                 </div><br>
