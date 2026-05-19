@@ -29,13 +29,23 @@
                     <input type="text" id="filtro-titulo" placeholder="Buscar por Título..."
                         style="padding: 6px; flex: 1; min-width: 200px;">
 
-                    <input type="text" id="filtro-disciplina" placeholder="Filtrar por Disciplina..."
-                        style="padding: 6px; flex: 1; min-width: 150px;">
+                    <select id="filtro-disciplina" style="padding: 6px; flex: 1; min-width: 150px;">
+                        <option value="">Todas as Disciplinas</option>
+                    </select>
 
-                    <input type="text" id="filtro-tag" placeholder="Filtrar por Tag..."
-                        style="padding: 6px; flex: 1; min-width: 120px;">
+                    <select id="filtro-tag" style="padding: 6px; flex: 1; min-width: 120px;">
+                        <option value="">Todas as Tags</option>
+                    </select>
 
-                    <input type="date" id="filtro-data" style="padding: 6px;">
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                        <label for="filtro-data-inicio" style="font-size: 14px;">De:</label>
+                        <input type="date" id="filtro-data-inicio" style="padding: 6px;">
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                        <label for="filtro-data-fim" style="font-size: 14px;">Até:</label>
+                        <input type="date" id="filtro-data-fim" style="padding: 6px;">
+                    </div>
                 </div>
 
                 <div

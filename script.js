@@ -4,17 +4,136 @@ let listaDePlanos = [];
 let paginaAtual = 1;
 const itensPorPagina = 2;
 
+function obterDadosMockados() {
+    return [
+        {
+            id: "mock-6",
+            titulo: "Gerenciamento de Estado Global com Context API",
+            disciplina: "Desenvolvimento Web",
+            dataPrevista: "2026-05-10",
+            objetivo: "Aprender a compartilhar estados entre componentes sem fazer prop drilling.",
+            ementa: "Criação de Contextos, uso do hook useContext e estruturação de Providers.",
+            conteudos: ["O que é Prop Drilling", "Criando um Contexto", "Consumindo dados globalmente"],
+            recursosApoio: ["VS Code", "Navegador", "Documentação do React"],
+            tags: ["React", "Frontend", "JavaScript"]
+        },
+        {
+            id: "mock-5",
+            titulo: "Construção de APIs REST com Django REST Framework",
+            disciplina: "Desenvolvimento Web",
+            dataPrevista: "2026-05-15",
+            objetivo: "Compreender o padrão REST e criar endpoints utilizando Serializers.",
+            ementa: "Introdução ao DRF, criação de Serializers, APIViews e ViewSets.",
+            conteudos: ["Princípios do REST", "Serialização de Modelos", "Rotas automáticas com Routers"],
+            recursosApoio: ["Python 3", "Postman", "Insomnia"],
+            tags: ["Django", "Backend", "Python"]
+        },
+        {
+            id: "mock-4",
+            titulo: "Consultas Avançadas e Junções em SQL",
+            disciplina: "Banco de Dados",
+            dataPrevista: "2026-05-20",
+            objetivo: "Dominar a extração de dados de múltiplas tabelas relacionais.",
+            ementa: "Uso de comandos JOIN, cláusulas GROUP BY, HAVING e funções de agregação.",
+            conteudos: ["INNER JOIN e LEFT JOIN", "Funções COUNT, SUM e AVG", "Filtragem com HAVING"],
+            recursosApoio: ["SQLite Studio", "DBeaver"],
+            tags: ["SQL", "SQLite", "Modelagem"]
+        },
+        {
+            id: "mock-3",
+            titulo: "Introdução a Componentes e Props no React",
+            disciplina: "Desenvolvimento Web",
+            dataPrevista: "2026-05-22",
+            objetivo: "Compreender a arquitetura baseada em componentes e passagem de propriedades.",
+            ementa: "Criação de componentes funcionais, reutilização de código e imutabilidade de props.",
+            conteudos: ["O que são componentes", "Renderização dinâmica", "Passagem de parâmetros"],
+            recursosApoio: ["VS Code", "Node.js", "Repositório do GitHub"],
+            tags: ["React", "Frontend", "JavaScript"]
+        },
+        {
+            id: "mock-2",
+            titulo: "Configuração de Rotas e Controllers no Django",
+            disciplina: "Desenvolvimento Web",
+            dataPrevista: "2026-05-28",
+            objetivo: "Aprender a mapear URLs e estruturar a lógica de resposta do servidor.",
+            ementa: "Mapeamento do arquivo urls.py, criação de views baseadas em funções e classes.",
+            conteudos: ["Padrão MVT", "Criação de Views", "Parâmetros de URL"],
+            recursosApoio: ["Python 3", "Postman", "Documentação do Django"],
+            tags: ["Django", "Backend", "Python"]
+        },
+        {
+            id: "mock-1",
+            titulo: "Modelagem de Banco de Dados Relacional",
+            disciplina: "Banco de Dados",
+            dataPrevista: "2026-06-05",
+            objetivo: "Dominar conceitos de chaves primárias, estrangeiras e integridade referencial.",
+            ementa: "Diagrama Entidade-Relacionamento, comandos DDL, restrições de chaves.",
+            conteudos: ["Chave Primária (PK)", "Chave Estrangeira (FK)", "Normalização"],
+            recursosApoio: ["SQLite Studio", "Quadro digital"],
+            tags: ["SQL", "SQLite", "Modelagem"]
+        }
+    ];
+}
+
 async function carregarPlanosDoBancoMock() {
     try {
         const resposta = await fetch(API_URL);
 
         if (!resposta.ok) throw new Error('Erro ao buscar dados do servidor');
 
-        listaDePlanos = await resposta.json();
+        const dadosDoServidor = await resposta.json();
+        const dadosMockados = obterDadosMockados();
+
+        listaDePlanos = [...dadosDoServidor, ...dadosMockados];
+
+        alimentarDropdownFiltros();
         desenharPlanosNaTela();
     } catch (erro) {
         console.error("Erro na integração:", erro);
-        document.getElementById('lista-planos').innerHTML = "Erro ao conectar com o servidor Back-end. Verifique se ele está ligado!";
+        listaDePlanos = obterDadosMockados();
+        alimentarDropdownFiltros();
+        desenharPlanosNaTela();
+    }
+}
+
+function alimentarDropdownFiltros() {
+    const seletorDisciplina = document.getElementById('filtro-disciplina');
+    const seletorTag = document.getElementById('filtro-tag');
+
+    const valorDisciplinaAtual = seletorDisciplina.value;
+    const valorTagAtual = seletorTag.value;
+
+    const disciplinasUnicas = new Set();
+    const tagsUnicas = new Set();
+
+    listaDePlanos.forEach(plano => {
+        if (plano.disciplina) disciplinasUnicas.add(plano.disciplina.trim());
+        if (plano.tags && Array.isArray(plano.tags)) {
+            plano.tags.forEach(tag => tagsUnicas.add(tag.trim()));
+        }
+    });
+
+    seletorDisciplina.innerHTML = '<option value="">Todas as Disciplinas</option>';
+    disciplinasUnicas.forEach(disciplina => {
+        const option = document.createElement('option');
+        option.value = disciplina;
+        option.textContent = disciplina;
+        seletorDisciplina.appendChild(option);
+    });
+
+    seletorTag.innerHTML = '<option value="">Todas as Tags</option>';
+    tagsUnicas.forEach(tag => {
+        const option = document.createElement('option');
+        option.value = tag;
+        option.textContent = tag;
+        seletorTag.appendChild(option);
+    });
+
+    if (disciplinasUnicas.has(valorDisciplinaAtual)) {
+        seletorDisciplina.value = valorDisciplinaAtual;
+    }
+    if (tagsUnicas.has(valorTagAtual)) {
+        seletorTag.value = valorTagAtual;
     }
 }
 
@@ -23,16 +142,24 @@ function desenharPlanosNaTela() {
     container.innerHTML = "";
 
     const buscaTitulo = document.getElementById('filtro-titulo').value.toLowerCase().trim();
-    const buscaDisciplina = document.getElementById('filtro-disciplina').value.toLowerCase().trim();
-    const buscaTag = document.getElementById('filtro-tag').value.toLowerCase().trim();
-    const buscaData = document.getElementById('filtro-data').value;
+    const buscaDisciplina = document.getElementById('filtro-disciplina').value;
+    const buscaTag = document.getElementById('filtro-tag').value;
+    const buscaDataInicio = document.getElementById('filtro-data-inicio').value;
+    const buscaDataFim = document.getElementById('filtro-data-fim').value;
     const tipoOrdenacao = document.getElementById('ordenacao-seletor').value;
 
     let planosExibidos = listaDePlanos.filter(plano => {
         const bateTitulo = plano.titulo.toLowerCase().includes(buscaTitulo);
-        const bateDisciplina = !buscaDisciplina || (plano.disciplina && plano.disciplina.toLowerCase().includes(buscaDisciplina));
-        const bateTag = !buscaTag || (plano.tags && plano.tags.some(t => t.toLowerCase().includes(buscaTag)));
-        const bateData = !buscaData || (plano.dataPrevista === buscaData);
+        const bateDisciplina = !buscaDisciplina || (plano.disciplina && plano.disciplina === buscaDisciplina);
+        const bateTag = !buscaTag || (plano.tags && plano.tags.includes(buscaTag));
+
+        let bateData = true;
+        if (plano.dataPrevista) {
+            if (buscaDataInicio && plano.dataPrevista < buscaDataInicio) bateData = false;
+            if (buscaDataFim && plano.dataPrevista > buscaDataFim) bateData = false;
+        } else if (buscaDataInicio || buscaDataFim) {
+            bateData = false;
+        }
 
         return bateTitulo && bateDisciplina && bateTag && bateData;
     });
@@ -42,9 +169,17 @@ function desenharPlanosNaTela() {
     } else if (tipoOrdenacao === "titulo-desc") {
         planosExibidos.sort((a, b) => b.titulo.localeCompare(a.titulo));
     } else if (tipoOrdenacao === "cadastro-asc") {
-        planosExibidos.sort((a, b) => a.id - b.id);
+        planosExibidos.sort((a, b) => {
+            const idA = typeof a.id === 'string' ? parseInt(a.id.replace('mock-', '')) : a.id;
+            const idB = typeof b.id === 'string' ? parseInt(b.id.replace('mock-', '')) : b.id;
+            return idA - idB;
+        });
     } else if (tipoOrdenacao === "cadastro-desc") {
-        planosExibidos.sort((a, b) => b.id - a.id);
+        planosExibidos.sort((a, b) => {
+            const idA = typeof a.id === 'string' ? parseInt(a.id.replace('mock-', '')) : a.id;
+            const idB = typeof b.id === 'string' ? parseInt(b.id.replace('mock-', '')) : b.id;
+            return idB - idA;
+        });
     }
 
     const indiceInicial = (paginaAtual - 1) * itensPorPagina;
@@ -76,6 +211,8 @@ function desenharPlanosNaTela() {
             ? plano.tags.map(tag => `<span style="background:#007bff; color:white; padding:3px 8px; border-radius:12px; font-size:12px; margin-right:5px; display:inline-block; margin-bottom:5px;">${tag}</span>`).join('')
             : '';
 
+        const paramId = typeof plano.id === 'string' ? `'${plano.id}'` : plano.id;
+
         container.innerHTML += `
             <div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; border-radius: 8px; font-family: sans-serif;">
                 <h2>${plano.titulo}</h2>
@@ -91,8 +228,8 @@ function desenharPlanosNaTela() {
 
                 <div style="margin-top: 10px; margin-bottom: 15px;">${listaTags}</div>
                 
-                <button onclick="prepararEdicao(${plano.id})" style="background: #ffc107; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; margin-right: 5px;">Editar</button>
-                <button onclick="apagarPlano(${plano.id})" style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">Excluir</button>
+                <button onclick="prepararEdicao(${paramId})" style="background: #ffc107; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; margin-right: 5px;">Editar</button>
+                <button onclick="apagarPlano(${paramId})" style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">Excluir</button>
             </div>
         `;
     });
@@ -201,7 +338,16 @@ function mostrarTelaEditar() {
 }
 
 async function apagarPlano(id) {
-    if (confirm("Tem certeza que deseja apagar este plano?")) {
+    if (typeof id === 'string' && id.startsWith('mock-')) {
+        if (confirm("Este é um plano de teste mockado. Deseja removê-lo da tela nesta sessão?")) {
+            listaDePlanos = listaDePlanos.filter(plano => plano.id !== id);
+            alimentarDropdownFiltros();
+            desenharPlanosNaTela();
+        }
+        return;
+    }
+
+    if (confirm("Tem certeza que deseja apagar este plano do Banco de Dados?")) {
         try {
             const resposta = await fetch(`${API_URL}/${id}`, {
                 method: 'DELETE'
@@ -210,6 +356,7 @@ async function apagarPlano(id) {
             if (!resposta.ok) throw new Error('Erro ao deletar no servidor');
 
             listaDePlanos = listaDePlanos.filter(plano => plano.id !== id);
+            alimentarDropdownFiltros();
             desenharPlanosNaTela();
             alert("Plano excluído com sucesso do Banco de Dados!");
         } catch (erro) {
@@ -223,6 +370,11 @@ function prepararEdicao(id) {
     const plano = listaDePlanos.find(p => p.id === id);
 
     if (plano) {
+        if (typeof id === 'string' && id.startsWith('mock-')) {
+            alert("Os dados mockados são apenas para visualização e testes de filtros. Para testar a edição completa com banco de dados, crie um novo plano!");
+            return;
+        }
+
         document.getElementById('edit-id').value = plano.id;
         document.getElementById('edit-titulo').value = plano.titulo;
         document.getElementById('edit-disciplina').value = plano.disciplina || '';
@@ -289,6 +441,7 @@ document.getElementById('form-plano').addEventListener('submit', async function 
         const planoSalvoNoBanco = await resposta.json();
 
         listaDePlanos.unshift(planoSalvoNoBanco);
+        alimentarDropdownFiltros();
         paginaAtual = 1;
         desenharPlanosNaTela();
         this.reset();
@@ -347,6 +500,7 @@ document.getElementById('form-editar-plano').addEventListener('submit', async fu
 
             Object.assign(planoLocal, dadosAtualizados);
 
+            alimentarDropdownFiltros();
             desenharPlanosNaTela();
             alert("Plano atualizado com sucesso no Banco!");
             mostrarListagem();
@@ -358,16 +512,18 @@ document.getElementById('form-editar-plano').addEventListener('submit', async fu
 });
 
 document.getElementById('filtro-titulo').addEventListener('input', () => { paginaAtual = 1; desenharPlanosNaTela(); });
-document.getElementById('filtro-disciplina').addEventListener('input', () => { paginaAtual = 1; desenharPlanosNaTela(); });
-document.getElementById('filtro-tag').addEventListener('input', () => { paginaAtual = 1; desenharPlanosNaTela(); });
-document.getElementById('filtro-data').addEventListener('change', () => { paginaAtual = 1; desenharPlanosNaTela(); });
+document.getElementById('filtro-disciplina').addEventListener('change', () => { paginaAtual = 1; desenharPlanosNaTela(); });
+document.getElementById('filtro-tag').addEventListener('change', () => { paginaAtual = 1; desenharPlanosNaTela(); });
+document.getElementById('filtro-data-inicio').addEventListener('change', () => { paginaAtual = 1; desenharPlanosNaTela(); });
+document.getElementById('filtro-data-fim').addEventListener('change', () => { paginaAtual = 1; desenharPlanosNaTela(); });
 document.getElementById('ordenacao-seletor').addEventListener('change', () => { desenharPlanosNaTela(); });
 
 document.getElementById('btn-limpar-filtros').addEventListener('click', function () {
     document.getElementById('filtro-titulo').value = "";
     document.getElementById('filtro-disciplina').value = "";
     document.getElementById('filtro-tag').value = "";
-    document.getElementById('filtro-data').value = "";
+    document.getElementById('filtro-data-inicio').value = "";
+    document.getElementById('filtro-data-fim').value = "";
     document.getElementById('ordenacao-seletor').value = "cadastro-desc";
     paginaAtual = 1;
     desenharPlanosNaTela();
