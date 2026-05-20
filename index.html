@@ -74,11 +74,19 @@
         <section id="tela-formulario" style="display: none;">
             <h2>Cadastrar Novo Plano</h2>
             <form id="form-plano">
-                <input type="text" id="titulo" placeholder="Título do Plano" required><br><br>
-                <input type="text" id="disciplina" placeholder="Disciplina" required><br><br>
-                <input type="date" id="dataPrevista" required><br><br>
-                <textarea id="objetivo" placeholder="Objetivo do plano" required></textarea><br><br>
-                <textarea id="ementa" placeholder="Ementa da disciplina" required></textarea><br><br>
+                <input type="text" id="titulo" placeholder="Título do Plano" required>Título do Plano<br><br>
+                <input type="text" id="disciplina" placeholder="Disciplina" required>Disciplina<br><br>
+                <textarea id="ementa" placeholder="Ementa da disciplina" required></textarea>Ementa<br><br>
+
+                <div style="margin-bottom: 20px;">
+                    <button type="button" id="btn-smart-assist"
+                        style="background: #28a745; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 8px;">
+                        ✨ Gerar Recomendações com IA (Smart Assist)
+                    </button>
+                </div>
+
+                <input type="date" id="dataPrevista" required>Data<br><br>
+                <textarea id="objetivo" placeholder="Objetivo do plano" required></textarea>Objetivo<br><br>
 
                 <div>
                     <label><strong>Conteúdos (obrigatório pelo menos um):</strong></label>

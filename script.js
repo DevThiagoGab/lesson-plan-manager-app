@@ -530,3 +530,83 @@ document.getElementById('btn-limpar-filtros').addEventListener('click', function
 });
 
 carregarPlanosDoBancoMock();
+
+document.getElementById('btn-smart-assist').addEventListener('click', async function() {
+    const campoTitulo = document.getElementById('titulo');
+    const campoDisciplina = document.getElementById('disciplina');
+    const campoEmenta = document.getElementById('ementa');
+
+    if (!campoTitulo.value.trim() || !campoEmenta.value.trim()) {
+        alert("Por favor, preencha pelo menos o Título e a Ementa para que a IA possa gerar recomendações!");
+        return;
+    }
+
+    const botao = document.getElementById('btn-smart-assist');
+    const textoOriginal = botao.innerHTML;
+    botao.innerHTML = "🤖 Pensando... Aguarde...";
+    botao.disabled = true;
+
+    try {
+        const resposta = await fetch('http://localhost:3000/api/smart-assist', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                titulo: campoTitulo.value,
+                disciplina: campoDisciplina.value,
+                ementa: campoEmenta.value
+            })
+        });
+
+        if (!resposta.ok) throw new Error('Erro na resposta da API.');
+
+        const respostaObjeto = await resposta.json();
+        
+        // 1. Extrai a string de texto crua que veio do n8n (posição 0, propriedade text)
+        let textoCru = respostaObjeto[0]?.text;
+        
+        if (!textoCru) {
+            throw new Error("O formato de resposta da IA não contém a propriedade 'text'.");
+        }
+
+        // Limpeza de segurança: Se o Gemini tiver envolvido o JSON em blocos de código markdown (```json ... ```), removemos
+        textoCru = textoCru.replace(/```json/g, "").replace(/```/g, "").trim();
+
+        // 2. Converte a string de texto crua em um objeto JavaScript real
+        const recomendacoes = JSON.parse(textoCru);
+
+        // 3. Limpa os containers antes de injetar os dados novos da IA
+        document.getElementById('container-conteudos').innerHTML = "";
+        document.getElementById('container-recursos').innerHTML = "";
+        document.getElementById('container-tags').innerHTML = "";
+
+        // 4. Preenche os Conteúdos sugeridos pela IA
+        if (recomendacoes.conteudos && recomendacoes.conteudos.length > 0) {
+            recomendacoes.conteudos.forEach(item => adicionarInput('container-conteudos', item));
+        } else {
+            adicionarInput('container-conteudos');
+        }
+
+        // 5. Preenche os Recursos de Apoio sugeridos pela IA
+        if (recomendacoes.recursosApoio && recomendacoes.recursosApoio.length > 0) {
+            recomendacoes.recursosApoio.forEach(item => adicionarInput('container-recursos', item));
+        } else {
+            adicionarInput('container-recursos');
+        }
+
+        // 6. Preenche as Tags sugeridas pela IA
+        if (recomendacoes.tags && recomendacoes.tags.length > 0) {
+            recomendacoes.tags.forEach(item => adicionarInput('container-tags', item));
+        } else {
+            adicionarInput('container-tags');
+        }
+
+        alert("✨ Campos preenchidos com sucesso pelo Smart Assist!");
+
+    } catch (erro) {
+        console.error("Erro no Smart Assist:", erro);
+        alert("Não foi possível gerar recomendações. Certifique-se de que o backend e o n8n estão rodando!");
+    } finally {
+        botao.innerHTML = textoOriginal;
+        botao.disabled = false;
+    }
+});
